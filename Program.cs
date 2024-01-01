@@ -1,58 +1,78 @@
-﻿namespace OffroadChalleng;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using static System.Net.Mime.MediaTypeNames;
+
+namespace ExamPreparation8;
 
 internal class Program
 {
     static void Main(string[] args)
     {
-        List<int> fuel = Console.ReadLine().Split().Select(int.Parse).ToList();
-        List<int> consumption = Console.ReadLine().Split().Select(int.Parse).ToList();
-        List<int> reach = Console.ReadLine().Split().Select(int.Parse).ToList();
+        Dictionary<string, int> table = new Dictionary<string, int>();
+        table.Add("salad", 350);
+        table.Add("soup", 490);
+        table.Add("pasta", 680);
+        table.Add("steak", 790);
 
-        List<string> memory = new List<string>();
-
-        int sum = 0;
-
-        int count = 0;
-
-        bool flag = false;
-
-        for (int i = 0; i < 4; i++)
+        Queue<string> meals = new Queue<string>(Console.ReadLine().Split(" ", StringSplitOptions.RemoveEmptyEntries));
+        Stack<int> calories = new Stack<int>
+            (Console.ReadLine().Split(" ", StringSplitOptions.RemoveEmptyEntries).Select(int.Parse));
+        int mealsCount = 0;
+        int leftover = 0;
+        bool next = true;
+        while (meals.Count > 0 && calories.Count > 0)
         {
-            sum = fuel[fuel.Count - 1] - consumption[0];
+            string meal = meals.Peek();
+            int currCal = calories.Peek();
+            int currMealCal = 0;
 
-            count++;
-
-            if (sum >= reach[0])
+            if (next)
             {
-                memory.Add($"Altitute {count}");
-
-                fuel.RemoveAt(fuel.Count - 1);
-                consumption.RemoveAt(0);
-                reach.RemoveAt(0);
-
-                Console.WriteLine($"Johon has reached: Altitude {count}");
+                currMealCal = table[meal];
             }
             else
             {
-                flag = true;
-                Console.WriteLine($"John did not reach: Altitude {count}");
-                break;
+                currMealCal = leftover;
             }
+
+
+            if (currCal > currMealCal)
+            {
+                meals.Dequeue();
+                calories.Pop();
+                currCal -= currMealCal;
+                calories.Push(currCal);
+                mealsCount++;
+                next = true;
+            }
+            else
+            {
+                calories.Pop();
+                currMealCal -= currCal;
+                leftover = currMealCal;
+                next = false;
+
+                if (calories.Count == 0)
+                {
+                    meals.Dequeue();
+                    mealsCount++;
+                }
+
+            }
+
         }
 
-        if (flag && count > 0)
+        if (meals.Count <= 0)
         {
-            Console.WriteLine($"John failed to reach the top.");
-            Console.WriteLine($"Reached altitudes: {string.Join(", ", memory)}");
+            Console.WriteLine($"John had {mealsCount} meals.");
+            Console.WriteLine($"For the next few days, he can eat {string.Join(", ", calories)} calories.");
         }
-        else if (flag)
+        else if (calories.Count <= 0)
         {
-            Console.WriteLine($"Jhon failed to reach the top.");
-            Console.WriteLine($"Jhon didn't reach the altitude.");
-        }
-        else
-        {
-            Console.WriteLine("John has reached all the altitudes and managed to reach the top!");
+            Console.WriteLine($"John ate enough, he had {mealsCount} meals.");
+            Console.WriteLine($"Meals left: {string.Join(", ", meals)}.");
         }
 
     }
