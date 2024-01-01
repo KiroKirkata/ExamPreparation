@@ -1,79 +1,78 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using static System.Net.Mime.MediaTypeNames;
 
-namespace ExamPreparation8;
+namespace ExamPreparation9;
 
-internal class Program
+class StartUp
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        Dictionary<string, int> table = new Dictionary<string, int>();
-        table.Add("salad", 350);
-        table.Add("soup", 490);
-        table.Add("pasta", 680);
-        table.Add("steak", 790);
+        int[] liliesSqeuence = Console.ReadLine()
+            .Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(int.Parse)
+            .ToArray();
+        int[] rosesSequence = Console.ReadLine()
+            .Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(int.Parse)
+            .ToArray();
 
-        Queue<string> meals = new Queue<string>(Console.ReadLine().Split(" ", StringSplitOptions.RemoveEmptyEntries));
-        Stack<int> calories = new Stack<int>
-            (Console.ReadLine().Split(" ", StringSplitOptions.RemoveEmptyEntries).Select(int.Parse));
-        int mealsCount = 0;
-        int leftover = 0;
-        bool next = true;
-        while (meals.Count > 0 && calories.Count > 0)
+        Stack<int> liliesStack = new Stack<int>(liliesSqeuence);
+        Queue<int> rosesQueue = new Queue<int>(rosesSequence);
+
+        int wreathsCounter = 0;
+        int leftFlowers = 0;
+        int operationsCount = rosesQueue.Count();
+        for (int i = 0; i < operationsCount; i++)
         {
-            string meal = meals.Peek();
-            int currCal = calories.Peek();
-            int currMealCal = 0;
-
-            if (next)
+            int lilies = liliesStack.Peek();
+            int roses = rosesQueue.Peek();
+            if (lilies + roses == 15)
             {
-                currMealCal = table[meal];
+                wreathsCounter++;
+                liliesStack.Pop();
+                rosesQueue.Dequeue();
             }
-            else
+            else if (lilies + roses > 15)
             {
-                currMealCal = leftover;
-            }
-
-
-            if (currCal > currMealCal)
-            {
-                meals.Dequeue();
-                calories.Pop();
-                currCal -= currMealCal;
-                calories.Push(currCal);
-                mealsCount++;
-                next = true;
-            }
-            else
-            {
-                calories.Pop();
-                currMealCal -= currCal;
-                leftover = currMealCal;
-                next = false;
-
-                if (calories.Count == 0)
+                while (true)
                 {
-                    meals.Dequeue();
-                    mealsCount++;
+                    lilies -= 2;
+                    if (lilies + roses == 15)
+                    {
+                        wreathsCounter++;
+                        liliesStack.Pop();
+                        rosesQueue.Dequeue();
+                        break;
+                    }
+                    else if (lilies + roses < 15)
+                    {
+                        leftFlowers += lilies + roses;
+                        liliesStack.Pop();
+                        rosesQueue.Dequeue();
+                        break;
+                    }
                 }
-
             }
-
+            else
+            {
+                leftFlowers += lilies + roses;
+                liliesStack.Pop();
+                rosesQueue.Dequeue();
+            }
         }
-
-        if (meals.Count <= 0)
+        if (leftFlowers >= 15)
         {
-            Console.WriteLine($"John had {mealsCount} meals.");
-            Console.WriteLine($"For the next few days, he can eat {string.Join(", ", calories)} calories.");
+            var leftOvers = leftFlowers / 15;
+            wreathsCounter += leftOvers;
         }
-        else if (calories.Count <= 0)
+        if (wreathsCounter >= 5)
         {
-            Console.WriteLine($"John ate enough, he had {mealsCount} meals.");
-            Console.WriteLine($"Meals left: {string.Join(", ", meals)}.");
+            Console.WriteLine($"You made it, you are going to the competition with {wreathsCounter} wreaths!");
         }
-
+        else
+        {
+            Console.WriteLine($"You didn't make it, you need {5 - wreathsCounter} wreaths more!");
+        }
     }
 }
