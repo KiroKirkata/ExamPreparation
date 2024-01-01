@@ -1,68 +1,99 @@
-﻿namespace ExamPreparation3;
-    internal class WormsAndHoles
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
+
+namespace ExamPreparation4;
+
+class Program
+{
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
+        int[] bombEffect = Console.ReadLine()
+            .Split(",", StringSplitOptions.RemoveEmptyEntries)
+            .Select(int.Parse)
+            .ToArray();
+
+        int[] bombCasings = Console.ReadLine()
+            .Split(",", StringSplitOptions.RemoveEmptyEntries)
+            .Select(int.Parse)
+            .ToArray();
+
+        Queue<int> BombQueue = new Queue<int>(bombEffect);
+        Stack<int> BombCasing = new Stack<int>(bombCasings);
+
+        int daturaCounter = 0;
+        int cherryCounter = 0;
+        int smokeCounter = 0;
+
+        bool allBombs = false;
+
+        while (BombCasing.Count > 0 && BombQueue.Count > 0)
         {
-            List<int> warmSize = Console.ReadLine().Split().Select(int.Parse).ToList();
-            List<int> holeSize = Console.ReadLine().Split().Select(int.Parse).ToList();
+            int effect = BombQueue.Peek();
+            int casing = BombCasing.Peek();
 
-            int machesCount = 0;
-
-            int wormCount = warmSize.Count;
-
-            while (warmSize.Count > 0 && holeSize.Count > 0)
+            if (effect + casing == 40)
             {
-                if (warmSize[warmSize.Count - 1] <= 0)
-                {
-                    warmSize.RemoveAt(warmSize.Count - 1);
-                }
-
-                if (warmSize[warmSize.Count - 1] == holeSize[0])
-                {
-                    warmSize.RemoveAt(warmSize.Count - 1);
-                    holeSize.RemoveAt(0);
-                    machesCount++;
-                }
-                else
-                {
-                    holeSize.RemoveAt(0);
-                    warmSize[warmSize.Count - 1] -= 3;
-                }
-
+                daturaCounter++;
+                BombCasing.Pop();
+                BombQueue.Dequeue();
             }
-
-            if (machesCount > 0)
+            else if (effect + casing == 60)
             {
-                Console.WriteLine($"Matches: {machesCount}");
+                cherryCounter++;
+                BombCasing.Pop();
+                BombQueue.Dequeue();
+            }
+            else if (effect + casing == 120)
+            {
+                smokeCounter++;
+                BombCasing.Pop();
+                BombQueue.Dequeue();
             }
             else
             {
-                Console.WriteLine("there are no matches.");
+                BombCasing.Pop();
+                BombCasing.Push(casing - 5);
             }
 
-            warmSize.Reverse();
+            if (daturaCounter >= 3 && cherryCounter >= 3 && smokeCounter >= 3)
+            {
+                allBombs = true;
+                break;
+            }
+        }
 
-            if (warmSize.Count <= 0 && machesCount == wormCount)
-            {
-                Console.WriteLine($"Every worm found a suitable hole!");
-            }
-            else if (machesCount != wormCount && wormCount <= 0)
-            {
+        if (allBombs)
+        {
+            Console.WriteLine("Bene! You have successfully filled the bomb pouch!");
+        }
+        else
+        {
+            Console.WriteLine("You don't have enough materials to fill the bomb pouch.");
+        }
 
-            }
-            else if (warmSize.Count > 0)
-            {
-                Console.WriteLine($"Worms left: {string.Join(", ", warmSize)}");
-            }
-
-            if (holeSize.Count <= 0)
-            {
-                Console.WriteLine($"Holes left: none");
-            }
-            else
-            {
-                Console.WriteLine($"Holes left: {string.Join(", ", holeSize)}");
-            }
+        if (BombQueue.Count == 0)
+        {
+            Console.WriteLine("Bomb Effects: empty");
+        }
+        else if (BombQueue.Count > 0)
+        {
+            Console.WriteLine($"Bomb Effects: {string.Join(", ", BombQueue)}");
 
         }
+
+        if (BombCasing.Count == 0)
+        {
+            Console.WriteLine("Bomb Casings: empty");
+        }
+        else if (BombCasing.Count > 0)
+        {
+            Console.WriteLine($"Bomb Casings: {string.Join(", ", BombCasing)}");
+
+        }
+
+        Console.WriteLine($"Cherry Bombs: {cherryCounter}");
+        Console.WriteLine($"Datura Bombs: {daturaCounter}");
+        Console.WriteLine($"Smoke Decoy Bombs: {smokeCounter}");
     }
+}
