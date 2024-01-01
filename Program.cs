@@ -1,55 +1,114 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-namespace ExamPreparation2;
-class MonsterExtermination_2_1
+
+namespace ExamPreparation2TresureHunt;
+
+class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        int[] monsterArms = Console.ReadLine().Split(',').Select(int.Parse).ToArray();
-        int[] soldierAttacks = Console.ReadLine().Split(',').Select(int.Parse).ToArray();
+        List<string> chest = Console.ReadLine().Split("|").ToList();
+        List<string> steal = new List<string>();
 
-        Queue<int> monsters = new Queue<int>(monsterArms);
-        Stack<int> soldiers = new Stack<int>(soldierAttacks);
+        double totalSum = 0;
 
-        int killedMonsters = 0;
+        string input = Console.ReadLine();
 
-        while (monsters.Count > 0 && soldiers.Count > 0)
+
+
+        while (input != "Yohoho!")
         {
-            int monsterArmor = monsters.Dequeue();
-            int soldierDamage = soldiers.Pop();
+            string[] command = input.Split();
 
-            if (soldierDamage >= monsterArmor)
+            switch (command[0])
             {
-                killedMonsters++;
-                int remainingDamage = soldierDamage - monsterArmor;
+                case "Loot":
+                    for (int i = 1; i < command.Length; i++)
+                    {
+                        if (!chest.Contains(command[i]))
+                        {
+                            chest.Insert(0, command[i]);
+                        }
+                    }
+                    break;
 
-                if (remainingDamage > 0 && soldiers.Count > 0)
-                {
-                    int nextAttack = soldiers.Pop() + remainingDamage;
-                    soldiers.Push(nextAttack);
-                }
-                else if (remainingDamage > 0)
-                {
-                    soldiers.Push(remainingDamage);
-                }
+                case "Drop":
+                    int dropIndex = int.Parse(command[1]);
+
+                    if (dropIndex >= 0 && dropIndex < chest.Count)
+
+                    {
+                        string currItem = chest[dropIndex];
+                        chest.RemoveAt(dropIndex);
+                        chest.Add(currItem);
+                    }
+                    break;
+
+                case "Steal":
+
+                    int count = int.Parse(command[1]);
+
+
+                    if (count < chest.Count)
+                    {
+
+                        for (int i = chest.Count - count; i < chest.Count; i++)
+                        {
+                            steal.Add(chest[i]);
+                        }
+                        Console.WriteLine(string.Join(", ", steal));
+                        steal.Clear();
+
+                        chest.RemoveRange(chest.Count - count, count);
+
+                    }
+
+                    else
+                    {
+
+                        for (int i = 0; i < chest.Count; i++)
+                        {
+                            steal.Add(chest[i]);
+                        }
+
+                        Console.WriteLine(string.Join(", ", steal));
+
+                        steal.Clear();
+
+                        chest.RemoveRange(0, chest.Count);
+
+                    }
+
+
+                    break;
+
+                default:
+                    break;
             }
-            else
+
+            input = Console.ReadLine();
+        }
+
+        if (chest.Count != 0)
+        {
+            double sum = 0;
+            int counter = 0;
+
+            for (int i = 0; i < chest.Count; i++)
             {
-                int reducedArmor = monsterArmor - soldierDamage;
-                monsters.Enqueue(reducedArmor);
+                sum += chest[i].Length;
+                counter++;
             }
+
+            totalSum = sum / counter;
+
+            Console.WriteLine($"Average treasure gain: {totalSum:f2} pirate credits.");
         }
 
-        if (monsters.Count == 0)
+        else
         {
-            Console.WriteLine("All monsters have been killed!");
+            Console.WriteLine("Failed treasure hunt.");
         }
-        if (soldiers.Count == 0)
-        {
-            Console.WriteLine("The soldier has been defeated.");
-        }
-
-        Console.WriteLine($"Total monsters killed: {killedMonsters}");
     }
 }
