@@ -1,99 +1,35 @@
 ﻿using System;
-using System.Linq;
-using System.Collections.Generic;
 
-namespace ExamPreparation4;
+namespace ExamPreparation5;
 
 class Program
 {
     static void Main(string[] args)
     {
-        int[] bombEffect = Console.ReadLine()
-            .Split(",", StringSplitOptions.RemoveEmptyEntries)
-            .Select(int.Parse)
-            .ToArray();
+        int energy = int.Parse(Console.ReadLine());
+        string input = string.Empty;
 
-        int[] bombCasings = Console.ReadLine()
-            .Split(",", StringSplitOptions.RemoveEmptyEntries)
-            .Select(int.Parse)
-            .ToArray();
+        int rountCounter = 0;
 
-        Queue<int> BombQueue = new Queue<int>(bombEffect);
-        Stack<int> BombCasing = new Stack<int>(bombCasings);
-
-        int daturaCounter = 0;
-        int cherryCounter = 0;
-        int smokeCounter = 0;
-
-        bool allBombs = false;
-
-        while (BombCasing.Count > 0 && BombQueue.Count > 0)
+        while ((input = Console.ReadLine()) != "End of battle")
         {
-            int effect = BombQueue.Peek();
-            int casing = BombCasing.Peek();
+            int distance = int.Parse(input);
 
-            if (effect + casing == 40)
+            if (energy < distance)
             {
-                daturaCounter++;
-                BombCasing.Pop();
-                BombQueue.Dequeue();
-            }
-            else if (effect + casing == 60)
-            {
-                cherryCounter++;
-                BombCasing.Pop();
-                BombQueue.Dequeue();
-            }
-            else if (effect + casing == 120)
-            {
-                smokeCounter++;
-                BombCasing.Pop();
-                BombQueue.Dequeue();
-            }
-            else
-            {
-                BombCasing.Pop();
-                BombCasing.Push(casing - 5);
+                Console.WriteLine($"Not enough energy! Game ends with {rountCounter} won battles and {energy} energy");
+                return;
             }
 
-            if (daturaCounter >= 3 && cherryCounter >= 3 && smokeCounter >= 3)
+            rountCounter++;
+            energy -= distance;
+
+            if (rountCounter % 3 == 0)
             {
-                allBombs = true;
-                break;
+                energy += rountCounter;
             }
         }
 
-        if (allBombs)
-        {
-            Console.WriteLine("Bene! You have successfully filled the bomb pouch!");
-        }
-        else
-        {
-            Console.WriteLine("You don't have enough materials to fill the bomb pouch.");
-        }
-
-        if (BombQueue.Count == 0)
-        {
-            Console.WriteLine("Bomb Effects: empty");
-        }
-        else if (BombQueue.Count > 0)
-        {
-            Console.WriteLine($"Bomb Effects: {string.Join(", ", BombQueue)}");
-
-        }
-
-        if (BombCasing.Count == 0)
-        {
-            Console.WriteLine("Bomb Casings: empty");
-        }
-        else if (BombCasing.Count > 0)
-        {
-            Console.WriteLine($"Bomb Casings: {string.Join(", ", BombCasing)}");
-
-        }
-
-        Console.WriteLine($"Cherry Bombs: {cherryCounter}");
-        Console.WriteLine($"Datura Bombs: {daturaCounter}");
-        Console.WriteLine($"Smoke Decoy Bombs: {smokeCounter}");
+        Console.WriteLine($"Won battles: {rountCounter}. Energy left: {energy}");
     }
 }
