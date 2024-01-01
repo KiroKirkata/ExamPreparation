@@ -1,55 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-namespace ExamPreparation2;
-class MonsterExtermination_2_1
+﻿namespace OffroadChalleng;
+
+internal class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        int[] monsterArms = Console.ReadLine().Split(',').Select(int.Parse).ToArray();
-        int[] soldierAttacks = Console.ReadLine().Split(',').Select(int.Parse).ToArray();
+        List<int> fuel = Console.ReadLine().Split().Select(int.Parse).ToList();
+        List<int> consumption = Console.ReadLine().Split().Select(int.Parse).ToList();
+        List<int> reach = Console.ReadLine().Split().Select(int.Parse).ToList();
 
-        Queue<int> monsters = new Queue<int>(monsterArms);
-        Stack<int> soldiers = new Stack<int>(soldierAttacks);
+        List<string> memory = new List<string>();
 
-        int killedMonsters = 0;
+        int sum = 0;
 
-        while (monsters.Count > 0 && soldiers.Count > 0)
+        int count = 0;
+
+        bool flag = false;
+
+        for (int i = 0; i < 4; i++)
         {
-            int monsterArmor = monsters.Dequeue();
-            int soldierDamage = soldiers.Pop();
+            sum = fuel[fuel.Count - 1] - consumption[0];
 
-            if (soldierDamage >= monsterArmor)
+            count++;
+
+            if (sum >= reach[0])
             {
-                killedMonsters++;
-                int remainingDamage = soldierDamage - monsterArmor;
+                memory.Add($"Altitute {count}");
 
-                if (remainingDamage > 0 && soldiers.Count > 0)
-                {
-                    int nextAttack = soldiers.Pop() + remainingDamage;
-                    soldiers.Push(nextAttack);
-                }
-                else if (remainingDamage > 0)
-                {
-                    soldiers.Push(remainingDamage);
-                }
+                fuel.RemoveAt(fuel.Count - 1);
+                consumption.RemoveAt(0);
+                reach.RemoveAt(0);
+
+                Console.WriteLine($"Johon has reached: Altitude {count}");
             }
             else
             {
-                int reducedArmor = monsterArmor - soldierDamage;
-                monsters.Enqueue(reducedArmor);
+                flag = true;
+                Console.WriteLine($"John did not reach: Altitude {count}");
+                break;
             }
         }
 
-        if (monsters.Count == 0)
+        if (flag && count > 0)
         {
-            Console.WriteLine("All monsters have been killed!");
+            Console.WriteLine($"John failed to reach the top.");
+            Console.WriteLine($"Reached altitudes: {string.Join(", ", memory)}");
         }
-        if (soldiers.Count == 0)
+        else if (flag)
         {
-            Console.WriteLine("The soldier has been defeated.");
+            Console.WriteLine($"Jhon failed to reach the top.");
+            Console.WriteLine($"Jhon didn't reach the altitude.");
+        }
+        else
+        {
+            Console.WriteLine("John has reached all the altitudes and managed to reach the top!");
         }
 
-        Console.WriteLine($"Total monsters killed: {killedMonsters}");
     }
 }
