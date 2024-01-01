@@ -1,33 +1,68 @@
-﻿using System;
-namespace ExamPreparation1;
-class Program
-{
-    static void Solve()
+﻿namespace ExamPreparation3;
+    internal class WormsAndHoles
     {
-        int studentsCount = int.Parse(Console.ReadLine());
-        int allLectures = int.Parse(Console.ReadLine());
-        int initialBonus = int.Parse(Console.ReadLine());
-        int maxAtt = 0;
-        double maxBonus = 0;
-
-        for (int i = 0; i < studentsCount; i++)
+        static void Main(string[] args)
         {
-            int attendances = int.Parse(Console.ReadLine());
-            double bonus = (attendances / (double)allLectures) * (5 + initialBonus);
+            List<int> warmSize = Console.ReadLine().Split().Select(int.Parse).ToList();
+            List<int> holeSize = Console.ReadLine().Split().Select(int.Parse).ToList();
 
-            if (bonus >= maxBonus)
+            int machesCount = 0;
+
+            int wormCount = warmSize.Count;
+
+            while (warmSize.Count > 0 && holeSize.Count > 0)
             {
-                maxBonus = bonus;
-                maxAtt = attendances;
+                if (warmSize[warmSize.Count - 1] <= 0)
+                {
+                    warmSize.RemoveAt(warmSize.Count - 1);
+                }
+
+                if (warmSize[warmSize.Count - 1] == holeSize[0])
+                {
+                    warmSize.RemoveAt(warmSize.Count - 1);
+                    holeSize.RemoveAt(0);
+                    machesCount++;
+                }
+                else
+                {
+                    holeSize.RemoveAt(0);
+                    warmSize[warmSize.Count - 1] -= 3;
+                }
+
             }
+
+            if (machesCount > 0)
+            {
+                Console.WriteLine($"Matches: {machesCount}");
+            }
+            else
+            {
+                Console.WriteLine("there are no matches.");
+            }
+
+            warmSize.Reverse();
+
+            if (warmSize.Count <= 0 && machesCount == wormCount)
+            {
+                Console.WriteLine($"Every worm found a suitable hole!");
+            }
+            else if (machesCount != wormCount && wormCount <= 0)
+            {
+
+            }
+            else if (warmSize.Count > 0)
+            {
+                Console.WriteLine($"Worms left: {string.Join(", ", warmSize)}");
+            }
+
+            if (holeSize.Count <= 0)
+            {
+                Console.WriteLine($"Holes left: none");
+            }
+            else
+            {
+                Console.WriteLine($"Holes left: {string.Join(", ", holeSize)}");
+            }
+
         }
-
-        Console.WriteLine($"Max Bonus: {Math.Ceiling(maxBonus)}.");
-        Console.WriteLine($"The student has attended {maxAtt} lectures.");
     }
-
-    static void Main()
-    {
-        Solve();
-    }
-}
