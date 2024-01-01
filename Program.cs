@@ -1,114 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace ExamPreparation10;
-
+namespace ExamPreparation1;
 class Program
 {
-    static void Main(string[] args)
+    static void Solve()
     {
-        List<string> chest = Console.ReadLine().Split("|").ToList();
-        List<string> steal = new List<string>();
+        int studentsCount = int.Parse(Console.ReadLine());
+        int allLectures = int.Parse(Console.ReadLine());
+        int initialBonus = int.Parse(Console.ReadLine());
+        int maxAtt = 0;
+        double maxBonus = 0;
 
-        double totalSum = 0;
-
-        string input = Console.ReadLine();
-
-
-
-        while (input != "Yohoho!")
+        for (int i = 0; i < studentsCount; i++)
         {
-            string[] command = input.Split();
+            int attendances = int.Parse(Console.ReadLine());
+            double bonus = (attendances / (double)allLectures) * (5 + initialBonus);
 
-            switch (command[0])
+            if (bonus >= maxBonus)
             {
-                case "Loot":
-                    for (int i = 1; i < command.Length; i++)
-                    {
-                        if (!chest.Contains(command[i]))
-                        {
-                            chest.Insert(0, command[i]);
-                        }
-                    }
-                    break;
-
-                case "Drop":
-                    int dropIndex = int.Parse(command[1]);
-
-                    if (dropIndex >= 0 && dropIndex < chest.Count)
-
-                    {
-                        string currItem = chest[dropIndex];
-                        chest.RemoveAt(dropIndex);
-                        chest.Add(currItem);
-                    }
-                    break;
-
-                case "Steal":
-
-                    int count = int.Parse(command[1]);
-
-
-                    if (count < chest.Count)
-                    {
-
-                        for (int i = chest.Count - count; i < chest.Count; i++)
-                        {
-                            steal.Add(chest[i]);
-                        }
-                        Console.WriteLine(string.Join(", ", steal));
-                        steal.Clear();
-
-                        chest.RemoveRange(chest.Count - count, count);
-
-                    }
-
-                    else
-                    {
-
-                        for (int i = 0; i < chest.Count; i++)
-                        {
-                            steal.Add(chest[i]);
-                        }
-
-                        Console.WriteLine(string.Join(", ", steal));
-
-                        steal.Clear();
-
-                        chest.RemoveRange(0, chest.Count);
-
-                    }
-
-
-                    break;
-
-                default:
-                    break;
+                maxBonus = bonus;
+                maxAtt = attendances;
             }
-
-            input = Console.ReadLine();
         }
 
-        if (chest.Count != 0)
-        {
-            double sum = 0;
-            int counter = 0;
+        Console.WriteLine($"Max Bonus: {Math.Ceiling(maxBonus)}.");
+        Console.WriteLine($"The student has attended {maxAtt} lectures.");
+    }
 
-            for (int i = 0; i < chest.Count; i++)
-            {
-                sum += chest[i].Length;
-                counter++;
-            }
-
-            totalSum = sum / counter;
-
-            Console.WriteLine($"Average treasure gain: {totalSum:f2} pirate credits.");
-        }
-
-        else
-        {
-            Console.WriteLine("Failed treasure hunt.");
-        }
+    static void Main()
+    {
+        Solve();
     }
 }
