@@ -1,55 +1,76 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-namespace ExamPreparation2;
-class MonsterExtermination_2_1
+namespace ExamPreparation11;
+
+class Program
 {
     static void Main()
     {
-        int[] monsterArms = Console.ReadLine().Split(',').Select(int.Parse).ToArray();
-        int[] soldierAttacks = Console.ReadLine().Split(',').Select(int.Parse).ToArray();
+        List<int> targets = Console.ReadLine()
+            .Split(" ", StringSplitOptions.RemoveEmptyEntries)
+            .Select(int.Parse)
+            .ToList();
 
-        Queue<int> monsters = new Queue<int>(monsterArms);
-        Stack<int> soldiers = new Stack<int>(soldierAttacks);
 
-        int killedMonsters = 0;
-
-        while (monsters.Count > 0 && soldiers.Count > 0)
+        while (true)
         {
-            int monsterArmor = monsters.Dequeue();
-            int soldierDamage = soldiers.Pop();
+            string input = Console.ReadLine();
 
-            if (soldierDamage >= monsterArmor)
+            if (input == "End")
             {
-                killedMonsters++;
-                int remainingDamage = soldierDamage - monsterArmor;
+                break;
+            }
 
-                if (remainingDamage > 0 && soldiers.Count > 0)
+            string[] commandInput = input.Split().ToArray();
+
+            string command = commandInput[0];
+            int index = int.Parse(commandInput[1]);
+
+            if (command == "Shoot")
+            {
+                int power = int.Parse(commandInput[2]);
+
+                if (index >= 0 && index < targets.Count)
                 {
-                    int nextAttack = soldiers.Pop() + remainingDamage;
-                    soldiers.Push(nextAttack);
-                }
-                else if (remainingDamage > 0)
-                {
-                    soldiers.Push(remainingDamage);
+                    targets[index] -= power;
+
+                    if (targets[index] <= 0)
+                    {
+                        targets.RemoveAt(index);
+                    }
                 }
             }
-            else
+            else if (command == "Add")
             {
-                int reducedArmor = monsterArmor - soldierDamage;
-                monsters.Enqueue(reducedArmor);
+                int value = int.Parse(commandInput[2]);
+
+                if (index >= 0 && index < input.Length)
+                {
+                    targets.Insert(index, value);
+                }
+                else
+                {
+                    Console.WriteLine("Invalid placement!");
+                }
+            }
+            else if (command == "Strike")
+            {
+                int radius = int.Parse(commandInput[2]);
+
+                if (index - radius >= 0 && index + radius < targets[targets.Count - 1])
+                {
+                    targets.RemoveRange(index - radius, radius * 2 + 1);
+                }
+                else
+                {
+                    Console.WriteLine($"Strike missed!");
+                }
             }
         }
 
-        if (monsters.Count == 0)
-        {
-            Console.WriteLine("All monsters have been killed!");
-        }
-        if (soldiers.Count == 0)
-        {
-            Console.WriteLine("The soldier has been defeated.");
-        }
+        Console.WriteLine(string.Join("|", targets));
 
-        Console.WriteLine($"Total monsters killed: {killedMonsters}");
     }
 }
