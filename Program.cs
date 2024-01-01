@@ -1,35 +1,42 @@
 ﻿using System;
-
-namespace ExamPreparation5;
-
+namespace ExamPreparation6;
 class Program
 {
-    static void Main(string[] args)
+    static void Flag()
     {
-        int energy = int.Parse(Console.ReadLine());
-        string input = string.Empty;
+        int days = int.Parse(Console.ReadLine());
+        int plunderForDay = int.Parse(Console.ReadLine());
+        int expectedPlunder = int.Parse(Console.ReadLine());
+        double total = 0;
 
-        int rountCounter = 0;
-
-        while ((input = Console.ReadLine()) != "End of battle")
+        for (int i = 1; i <= days; i++)
         {
-            int distance = int.Parse(input);
+            total += plunderForDay;
 
-            if (energy < distance)
+            if (i % 3 == 0)
             {
-                Console.WriteLine($"Not enough energy! Game ends with {rountCounter} won battles and {energy} energy");
-                return;
+                total += plunderForDay * 0.5;
             }
 
-            rountCounter++;
-            energy -= distance;
-
-            if (rountCounter % 3 == 0)
+            if (i % 5 == 0)
             {
-                energy += rountCounter;
+                total -= total * 0.3;
             }
         }
 
-        Console.WriteLine($"Won battles: {rountCounter}. Energy left: {energy}");
+        if (total >= expectedPlunder)
+        {
+            Console.WriteLine($"Ahoy! {total:F2} plunder gained.");
+        }
+        else
+        {
+            double percentage = total / expectedPlunder * 100;
+            Console.WriteLine($"Collected only {percentage:F2}% of the plunder.");
+        }
+    }
+
+    static void Main()
+    {
+        Flag();
     }
 }
